@@ -1,0 +1,257 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model asignacion_turno {
+  id_asignacion          Int                      @id @default(autoincrement())
+  id_empleado            Int
+  id_turno               Int
+  id_equipo              Int?
+  id_configuracion       Int?
+  fecha_hora_inicio      DateTime                 @db.DateTime(0)
+  fecha_hora_fin         DateTime                 @db.DateTime(0)
+  origen_asignacion      String                   @db.VarChar(30)
+  observacion            String?                  @db.VarChar(300)
+  estado                 String                   @db.VarChar(20)
+  configuracion_rotacion configuracion_rotacion?  @relation(fields: [id_configuracion], references: [id_configuracion], onDelete: NoAction, onUpdate: NoAction, map: "fk_asignacion_configuracion")
+  empleado               empleado                 @relation(fields: [id_empleado], references: [id_empleado], onDelete: NoAction, onUpdate: NoAction, map: "fk_asignacion_empleado")
+  equipo                 equipo?                  @relation(fields: [id_equipo], references: [id_equipo], onDelete: NoAction, onUpdate: NoAction, map: "fk_asignacion_equipo")
+  turno                  turno                    @relation(fields: [id_turno], references: [id_turno], onDelete: NoAction, onUpdate: NoAction, map: "fk_asignacion_turno")
+  solicitud_cambio_turno solicitud_cambio_turno[]
+
+  @@index([id_configuracion], map: "fk_asignacion_configuracion")
+  @@index([id_empleado], map: "fk_asignacion_empleado")
+  @@index([id_equipo], map: "fk_asignacion_equipo")
+  @@index([id_turno], map: "fk_asignacion_turno")
+}
+
+model auditoria {
+  id_auditoria   Int      @id @default(autoincrement())
+  id_usuario     Int
+  tabla_afectada String   @db.VarChar(100)
+  id_registro    Int
+  accion         String   @db.VarChar(30)
+  fecha_hora     DateTime @db.DateTime(0)
+  detalle        String?  @db.VarChar(500)
+  usuario        usuario  @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_auditoria_usuario")
+
+  @@index([id_usuario], map: "fk_auditoria_usuario")
+}
+
+model configuracion_rotacion {
+  id_configuracion  Int                 @id @default(autoincrement())
+  id_empresa        Int
+  nombre_rotacion   String              @db.VarChar(100)
+  periodicidad      String              @db.VarChar(30)
+  fecha_inicio      DateTime            @db.Date
+  dias_laborales    String?             @db.VarChar(100)
+  horas_objetivo    Decimal?            @db.Decimal(5, 2)
+  estado            String              @db.VarChar(20)
+  asignacion_turno  asignacion_turno[]
+  empresa           empresa             @relation(fields: [id_empresa], references: [id_empresa], onDelete: NoAction, onUpdate: NoAction, map: "fk_rotacion_empresa")
+  detalle_rotacion  detalle_rotacion[]
+  empleado_rotacion empleado_rotacion[]
+
+  @@index([id_empresa], map: "fk_rotacion_empresa")
+}
+
+model detalle_rotacion {
+  id_detalle_rotacion    Int                    @id @default(autoincrement())
+  id_configuracion       Int
+  orden_rotacion         Int
+  id_turno               Int
+  configuracion_rotacion configuracion_rotacion @relation(fields: [id_configuracion], references: [id_configuracion], onDelete: NoAction, onUpdate: NoAction, map: "fk_detalle_rotacion_configuracion")
+  turno                  turno                  @relation(fields: [id_turno], references: [id_turno], onDelete: NoAction, onUpdate: NoAction, map: "fk_detalle_rotacion_turno")
+
+  @@unique([id_configuracion, orden_rotacion], map: "uq_rotacion_orden")
+  @@index([id_turno], map: "fk_detalle_rotacion_turno")
+}
+
+model empleado {
+  id_empleado                                                                  Int                      @id @default(autoincrement())
+  documento                                                                    String                   @db.VarChar(20)
+  nombres                                                                      String                   @db.VarChar(100)
+  apellidos                                                                    String                   @db.VarChar(100)
+  correo                                                                       String?                  @db.VarChar(150)
+  telefono                                                                     String?                  @db.VarChar(20)
+  fecha_ingreso                                                                DateTime                 @db.Date
+  estado                                                                       String                   @db.VarChar(20)
+  id_empresa                                                                   Int
+  asignacion_turno                                                             asignacion_turno[]
+  empresa                                                                      empresa                  @relation(fields: [id_empresa], references: [id_empresa], onDelete: NoAction, onUpdate: NoAction, map: "fk_empleado_empresa")
+  empleado_equipo                                                              empleado_equipo[]
+  empleado_rotacion                                                            empleado_rotacion[]
+  novedad_empleado                                                             novedad_empleado[]
+  solicitud_cambio_turno_solicitud_cambio_turno_id_empleado_destinoToempleado  solicitud_cambio_turno[] @relation("solicitud_cambio_turno_id_empleado_destinoToempleado")
+  solicitud_cambio_turno_solicitud_cambio_turno_id_empleado_solicitaToempleado solicitud_cambio_turno[] @relation("solicitud_cambio_turno_id_empleado_solicitaToempleado")
+
+  @@index([id_empresa], map: "fk_empleado_empresa")
+}
+
+model empleado_equipo {
+  id_empleado_equipo  Int       @id @default(autoincrement())
+  id_empleado         Int
+  id_equipo           Int
+  nivel_habilidad     String?   @db.VarChar(30)
+  estado_habilitacion String    @db.VarChar(30)
+  fecha_habilitacion  DateTime? @db.Date
+  fecha_vencimiento   DateTime? @db.Date
+  empleado            empleado  @relation(fields: [id_empleado], references: [id_empleado], onDelete: NoAction, onUpdate: NoAction, map: "fk_empleado_equipo_empleado")
+  equipo              equipo    @relation(fields: [id_equipo], references: [id_equipo], onDelete: NoAction, onUpdate: NoAction, map: "fk_empleado_equipo_equipo")
+
+  @@unique([id_empleado, id_equipo], map: "uq_empleado_equipo")
+  @@index([id_equipo], map: "fk_empleado_equipo_equipo")
+}
+
+model empleado_rotacion {
+  id_empleado_rotacion   Int                    @id @default(autoincrement())
+  id_empleado            Int
+  id_configuracion       Int
+  fecha_inicio           DateTime               @db.Date
+  fecha_fin              DateTime?              @db.Date
+  estado                 String                 @db.VarChar(20)
+  configuracion_rotacion configuracion_rotacion @relation(fields: [id_configuracion], references: [id_configuracion], onDelete: NoAction, onUpdate: NoAction, map: "fk_empleado_rotacion_configuracion")
+  empleado               empleado               @relation(fields: [id_empleado], references: [id_empleado], onDelete: NoAction, onUpdate: NoAction, map: "fk_empleado_rotacion_empleado")
+
+  @@index([id_configuracion], map: "fk_empleado_rotacion_configuracion")
+  @@index([id_empleado], map: "fk_empleado_rotacion_empleado")
+}
+
+model empresa {
+  id_empresa             Int                      @id @default(autoincrement())
+  nit                    String                   @db.VarChar(20)
+  nombre_empresa         String                   @db.VarChar(150)
+  correo_contacto        String?                  @db.VarChar(150)
+  telefono               String?                  @db.VarChar(20)
+  direccion              String?                  @db.VarChar(200)
+  estado                 String                   @db.VarChar(20)
+  id_plan                Int
+  configuracion_rotacion configuracion_rotacion[]
+  empleado               empleado[]
+  plan_suscripcion       plan_suscripcion         @relation(fields: [id_plan], references: [id_plan], onDelete: NoAction, onUpdate: NoAction, map: "fk_empresa_plan")
+  equipo                 equipo[]
+  turno                  turno[]
+  usuario                usuario[]
+
+  @@index([id_plan], map: "fk_empresa_plan")
+}
+
+model equipo {
+  id_equipo        Int                @id @default(autoincrement())
+  nombre_equipo    String             @db.VarChar(100)
+  descripcion      String?            @db.VarChar(300)
+  estado           String             @db.VarChar(20)
+  id_empresa       Int
+  asignacion_turno asignacion_turno[]
+  empleado_equipo  empleado_equipo[]
+  empresa          empresa            @relation(fields: [id_empresa], references: [id_empresa], onDelete: NoAction, onUpdate: NoAction, map: "fk_equipo_empresa")
+
+  @@index([id_empresa], map: "fk_equipo_empresa")
+}
+
+model notificacion {
+  id_notificacion  Int       @id @default(autoincrement())
+  id_usuario       Int
+  titulo           String    @db.VarChar(150)
+  mensaje          String    @db.VarChar(300)
+  tipo             String    @db.VarChar(50)
+  fecha_generacion DateTime  @db.DateTime(0)
+  fecha_lectura    DateTime? @db.DateTime(0)
+  estado           String    @db.VarChar(20)
+  usuario          usuario   @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_notificacion_usuario")
+
+  @@index([id_usuario], map: "fk_notificacion_usuario")
+}
+
+model novedad_empleado {
+  id_novedad          Int       @id @default(autoincrement())
+  id_empleado         Int
+  tipo_novedad        String    @db.VarChar(50)
+  fecha_inicio        DateTime  @db.Date
+  fecha_fin           DateTime  @db.Date
+  hora_inicio         DateTime? @db.Time(0)
+  hora_fin            DateTime? @db.Time(0)
+  afecta_programacion Boolean   @default(true)
+  observacion         String?   @db.VarChar(300)
+  estado              String    @db.VarChar(20)
+  empleado            empleado  @relation(fields: [id_empleado], references: [id_empleado], onDelete: NoAction, onUpdate: NoAction, map: "fk_novedad_empleado")
+
+  @@index([id_empleado], map: "fk_novedad_empleado")
+}
+
+model plan_suscripcion {
+  id_plan          Int       @id @default(autoincrement())
+  nombre_plan      String    @db.VarChar(50)
+  maximo_empleados Int
+  valor_mensual    Decimal   @db.Decimal(10, 2)
+  estado           String    @db.VarChar(20)
+  empresa          empresa[]
+}
+
+model reporte {
+  id_reporte       Int      @id @default(autoincrement())
+  nombre_reporte   String   @db.VarChar(100)
+  fecha_generacion DateTime @db.DateTime(0)
+  tipo_reporte     String   @db.VarChar(50)
+  id_usuario       Int
+  usuario          usuario  @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_reporte_usuario")
+
+  @@index([id_usuario], map: "fk_reporte_usuario")
+}
+
+model solicitud_cambio_turno {
+  id_solicitud                                                   Int              @id @default(autoincrement())
+  id_asignacion_origen                                           Int
+  id_empleado_solicita                                           Int
+  id_empleado_destino                                            Int
+  fecha_solicitud                                                DateTime         @db.DateTime(0)
+  motivo                                                         String?          @db.VarChar(300)
+  estado_solicitud                                               String           @db.VarChar(20)
+  fecha_respuesta                                                DateTime?        @db.DateTime(0)
+  observacion_respuesta                                          String?          @db.VarChar(300)
+  asignacion_turno                                               asignacion_turno @relation(fields: [id_asignacion_origen], references: [id_asignacion], onDelete: NoAction, onUpdate: NoAction, map: "fk_solicitud_asignacion")
+  empleado_solicitud_cambio_turno_id_empleado_destinoToempleado  empleado         @relation("solicitud_cambio_turno_id_empleado_destinoToempleado", fields: [id_empleado_destino], references: [id_empleado], onDelete: NoAction, onUpdate: NoAction, map: "fk_solicitud_empleado_destino")
+  empleado_solicitud_cambio_turno_id_empleado_solicitaToempleado empleado         @relation("solicitud_cambio_turno_id_empleado_solicitaToempleado", fields: [id_empleado_solicita], references: [id_empleado], onDelete: NoAction, onUpdate: NoAction, map: "fk_solicitud_empleado_solicita")
+
+  @@index([id_asignacion_origen], map: "fk_solicitud_asignacion")
+  @@index([id_empleado_destino], map: "fk_solicitud_empleado_destino")
+  @@index([id_empleado_solicita], map: "fk_solicitud_empleado_solicita")
+}
+
+model turno {
+  id_turno         Int                @id @default(autoincrement())
+  id_empresa       Int
+  nombre_turno     String             @db.VarChar(50)
+  hora_inicio      DateTime           @db.Time(0)
+  hora_fin         DateTime           @db.Time(0)
+  cruza_medianoche Boolean            @default(false)
+  horas_turno      Decimal            @db.Decimal(4, 2)
+  color_calendario String?            @db.VarChar(20)
+  estado           String             @db.VarChar(20)
+  asignacion_turno asignacion_turno[]
+  detalle_rotacion detalle_rotacion[]
+  empresa          empresa            @relation(fields: [id_empresa], references: [id_empresa], onDelete: NoAction, onUpdate: NoAction, map: "fk_turno_empresa")
+
+  @@index([id_empresa], map: "fk_turno_empresa")
+}
+
+model usuario {
+  id_usuario      Int            @id @default(autoincrement())
+  nombre_usuario  String         @db.VarChar(100)
+  correo          String         @db.VarChar(150)
+  contrasena_hash String         @db.VarChar(255)
+  rol             String         @db.VarChar(30)
+  estado          String         @db.VarChar(20)
+  id_empresa      Int
+  auditoria       auditoria[]
+  notificacion    notificacion[]
+  reporte         reporte[]
+  empresa         empresa        @relation(fields: [id_empresa], references: [id_empresa], onDelete: NoAction, onUpdate: NoAction, map: "fk_usuario_empresa")
+
+  @@index([id_empresa], map: "fk_usuario_empresa")
+}
