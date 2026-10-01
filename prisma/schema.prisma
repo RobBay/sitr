@@ -251,7 +251,19 @@ model usuario {
   auditoria       auditoria[]
   notificacion    notificacion[]
   reporte         reporte[]
+  sesion          sesion[]
   empresa         empresa        @relation(fields: [id_empresa], references: [id_empresa], onDelete: NoAction, onUpdate: NoAction, map: "fk_usuario_empresa")
 
   @@index([id_empresa], map: "fk_usuario_empresa")
+}
+
+model sesion {
+  id_sesion        Int      @id @default(autoincrement())
+  token            String   @unique(map: "token") @db.VarChar(255)
+  id_usuario       Int
+  fecha_creacion   DateTime @default(now()) @db.DateTime(0)
+  fecha_expiracion DateTime @db.DateTime(0)
+  usuario          usuario  @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade, onUpdate: NoAction, map: "fk_sesion_usuario")
+
+  @@index([id_usuario], map: "fk_sesion_usuario")
 }
