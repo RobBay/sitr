@@ -277,6 +277,7 @@ model suscripcion {
   estado                   String           @db.VarChar(20)
   fecha_inicio             DateTime         @db.DateTime(0)
   fecha_fin_prueba         DateTime?        @db.DateTime(0)
+  fecha_fin_suscripcion    DateTime?        @db.DateTime(0)
   fecha_proxima_renovacion DateTime?        @db.DateTime(0)
   fecha_creacion           DateTime         @default(now()) @db.DateTime(0)
   empresa                  empresa          @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade, onUpdate: NoAction, map: "fk_suscripcion_empresa")
