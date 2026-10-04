@@ -832,3 +832,107 @@ GitHub:
 https://github.com/RobBay/sitr
 
 
+## 02/10/2026
+
+
+
+## 🔐 Autenticación y gestión de sesiones
+
+Se implementó el sistema base de autenticación de SITR utilizando **Next.js, Prisma, MySQL y bcrypt**.
+
+### Funcionalidades implementadas
+
+* Inicio de sesión mediante correo electrónico y contraseña.
+* Validación de contraseñas utilizando `bcryptjs`.
+* Contraseñas almacenadas únicamente como hash; nunca se guardan en texto plano.
+* Creación de sesiones del lado del servidor.
+* Sesiones almacenadas en la base de datos mediante la tabla `sesion`.
+* Sesiones con una duración de 7 días.
+* Cookie de sesión `HttpOnly` para evitar el acceso de JavaScript del navegador al token.
+* Cierre de sesión mediante endpoint dedicado.
+* Endpoint para consultar el usuario autenticado.
+* Protección de rutas mediante validación de sesión.
+* Redirección automática de usuarios no autenticados hacia `/login`.
+* Redirección automática de usuarios autenticados que intentan acceder nuevamente a `/login` hacia `/dashboard`.
+* Separación entre componentes de servidor y componentes de cliente.
+
+### Estructura principal
+
+```text
+src/
+├── app/
+│   ├── api/
+│   │   └── auth/
+│   │       ├── login/
+│   │       │   └── route.ts
+│   │       ├── logout/
+│   │       │   └── route.ts
+│   │       └── me/
+│   │           └── route.ts
+│   │
+│   ├── dashboard/
+│   │   └── page.tsx
+│   │
+│   └── login/
+│       ├── page.tsx
+│       └── login-form.tsx
+│
+└── lib/
+    └── auth/
+        ├── auth.ts
+        └── require-auth.ts
+```
+
+### Flujo de autenticación
+
+```text
+Usuario
+   │
+   ▼
+/login
+   │
+   ▼
+POST /api/auth/login
+   │
+   ▼
+Validación de credenciales
+   │
+   ▼
+bcrypt
+   │
+   ▼
+Creación de sesión
+   │
+   ▼
+Cookie HttpOnly
+   │
+   ▼
+/dashboard
+   │
+   ▼
+Validación de sesión
+```
+
+### Protección de rutas
+
+Las páginas que requieren autenticación utilizan una función reutilizable:
+
+```text
+requerirAutenticacion()
+```
+
+Esta función obtiene la sesión actual y, si no existe una sesión válida, redirige automáticamente al usuario hacia `/login`.
+
+### Endpoints de autenticación
+
+| Método | Endpoint           | Función                     |
+| ------ | ------------------ | --------------------------- |
+| `POST` | `/api/auth/login`  | Iniciar sesión              |
+| `POST` | `/api/auth/logout` | Cerrar sesión               |
+| `GET`  | `/api/auth/me`     | Obtener usuario autenticado |
+
+### Estado actual
+
+El flujo completo de autenticación se encuentra implementado y probado:
+
+**Login → creación de sesión → cookie → Dashboard protegido → logout → redirecciones según estado de sesión.**

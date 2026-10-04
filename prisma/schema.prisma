@@ -135,6 +135,7 @@ model empresa {
   empleado               empleado[]
   plan_suscripcion       plan_suscripcion         @relation(fields: [id_plan], references: [id_plan], onDelete: NoAction, onUpdate: NoAction, map: "fk_empresa_plan")
   equipo                 equipo[]
+  suscripcion            suscripcion[]
   turno                  turno[]
   usuario                usuario[]
 
@@ -185,12 +186,13 @@ model novedad_empleado {
 }
 
 model plan_suscripcion {
-  id_plan          Int       @id @default(autoincrement())
-  nombre_plan      String    @db.VarChar(50)
+  id_plan          Int           @id @default(autoincrement())
+  nombre_plan      String        @db.VarChar(50)
   maximo_empleados Int
-  valor_mensual    Decimal   @db.Decimal(10, 2)
-  estado           String    @db.VarChar(20)
+  valor_mensual    Decimal       @db.Decimal(10, 2)
+  estado           String        @db.VarChar(20)
   empresa          empresa[]
+  suscripcion      suscripcion[]
 }
 
 model reporte {
@@ -266,4 +268,20 @@ model sesion {
   usuario          usuario  @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade, onUpdate: NoAction, map: "fk_sesion_usuario")
 
   @@index([id_usuario], map: "fk_sesion_usuario")
+}
+
+model suscripcion {
+  id_suscripcion           Int              @id @default(autoincrement())
+  id_empresa               Int
+  id_plan                  Int
+  estado                   String           @db.VarChar(20)
+  fecha_inicio             DateTime         @db.DateTime(0)
+  fecha_fin_prueba         DateTime?        @db.DateTime(0)
+  fecha_proxima_renovacion DateTime?        @db.DateTime(0)
+  fecha_creacion           DateTime         @default(now()) @db.DateTime(0)
+  empresa                  empresa          @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade, onUpdate: NoAction, map: "fk_suscripcion_empresa")
+  plan_suscripcion         plan_suscripcion @relation(fields: [id_plan], references: [id_plan], onDelete: NoAction, onUpdate: NoAction, map: "fk_suscripcion_plan")
+
+  @@index([id_empresa], map: "fk_suscripcion_empresa")
+  @@index([id_plan], map: "fk_suscripcion_plan")
 }
