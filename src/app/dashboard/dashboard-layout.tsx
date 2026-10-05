@@ -133,9 +133,13 @@ export default function DashboardLayout({ children, nombreUsuario }: Props) {
             </a>
 
             <a
-              href="#"
+              href="/dashboard/turnos"
               title="Turnos"
-              className={`flex items-center rounded-lg text-sm font-medium text-slate-300 transition hover:bg-slate-800 hover:text-white ${
+              className={`flex items-center rounded-lg text-sm font-medium transition ${
+                pathname.startsWith("/dashboard/turnos")
+                  ? "bg-blue-600 text-white shadow-sm hover:bg-blue-700"
+                  : "text-slate-300 hover:bg-slate-800 hover:text-white"
+              } ${
                 sidebarColapsado
                   ? "justify-center px-2 py-3"
                   : "gap-3 px-4 py-3"

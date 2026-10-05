@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type Plan = {
@@ -18,27 +19,25 @@ export default function RegistroForm() {
   const [planSeleccionado, setPlanSeleccionado] = useState<number | null>(null);
 
   const [formulario, setFormulario] = useState({
-  nit: "",
-  nombre_empresa: "",
-  correo_contacto: "",
-  telefono: "",
-  direccion: "",
-  nombre_usuario: "",
-  correo: "",
-  contrasena: "",
-  confirmar_contrasena: "",
-});
+    nit: "",
+    nombre_empresa: "",
+    correo_contacto: "",
+    telefono: "",
+    direccion: "",
+    nombre_usuario: "",
+    correo: "",
+    contrasena: "",
+    confirmar_contrasena: "",
+  });
 
-function manejarCambio(
-  event: React.ChangeEvent<HTMLInputElement>
-) {
-  const { id, value } = event.target;
+  function manejarCambio(event: React.ChangeEvent<HTMLInputElement>) {
+    const { id, value } = event.target;
 
-  setFormulario((anterior) => ({
-    ...anterior,
-    [id]: value,
-  }));
-}
+    setFormulario((anterior) => ({
+      ...anterior,
+      [id]: value,
+    }));
+  }
 
   useEffect(() => {
     async function cargarPlanes() {
@@ -66,66 +65,67 @@ function manejarCambio(
   return (
     <main className="min-h-screen bg-gray-100 px-4 py-10">
       <div className="mx-auto max-w-5xl">
-        <form 
-            onSubmit={async (event) => {
-                event.preventDefault();
-                
-                if (planSeleccionado === null) {
-                    alert("Debes seleccionar un plan.");
-                    return;
-                }
+        <form
+          onSubmit={async (event) => {
+            event.preventDefault();
 
-                if (formulario.contrasena !== formulario.confirmar_contrasena) {
-                    alert("Las contraseñas no coinciden.");
-                    return;
-                }
+            if (planSeleccionado === null) {
+              alert("Debes seleccionar un plan.");
+              return;
+            }
 
-                try {
-                    const response = await fetch("/api/auth/registro", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        nit: formulario.nit,
-                        nombre_empresa: formulario.nombre_empresa,
-                        correo_contacto: formulario.correo_contacto,
-                        telefono: formulario.telefono,
-                        direccion: formulario.direccion,
-                        nombre_usuario: formulario.nombre_usuario,
-                        correo: formulario.correo,
-                        contrasena: formulario.contrasena,
-                        id_plan: planSeleccionado,
-                    }),
-                    });
+            if (formulario.contrasena !== formulario.confirmar_contrasena) {
+              alert("Las contraseñas no coinciden.");
+              return;
+            }
 
-                    const data = await response.json();
+            try {
+              const response = await fetch("/api/auth/registro", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  nit: formulario.nit,
+                  nombre_empresa: formulario.nombre_empresa,
+                  correo_contacto: formulario.correo_contacto,
+                  telefono: formulario.telefono,
+                  direccion: formulario.direccion,
+                  nombre_usuario: formulario.nombre_usuario,
+                  correo: formulario.correo,
+                  contrasena: formulario.contrasena,
+                  id_plan: planSeleccionado,
+                }),
+              });
 
-                    if (!response.ok || !data.ok) {
-                    alert(data.mensaje || "No fue posible crear la cuenta.");
-                    return;
-                    }
+              const data = await response.json();
 
-                    alert("¡Cuenta creada correctamente!");
+              if (!response.ok || !data.ok) {
+                alert(data.mensaje || "No fue posible crear la cuenta.");
+                return;
+              }
 
-                    router.push("/dashboard");
-                } catch (error) {
-                    console.error("Error al registrar:", error);
-                    alert("No fue posible conectar con el servidor.");
-                }
-                }}
+              alert("¡Cuenta creada correctamente!");
 
-            // onSubmit={(event) => {
-            //     event.preventDefault();
-            //     console.log("Formulario:", formulario);
-            //     console.log("Plan seleccionado:", planSeleccionado);
-            // }}
-            className="rounded-2xl bg-white p-8 shadow"
+              router.push("/dashboard");
+            } catch (error) {
+              console.error("Error al registrar:", error);
+              alert("No fue posible conectar con el servidor.");
+            }
+          }}
+          className="rounded-2xl bg-white p-8 shadow"
+        >
+          <div className="relative mb-8 text-center">
+            <button
+              type="button"
+              onClick={() => router.push("/login")}
+              title="Volver al inicio de sesión"
+              className="absolute right-0 top-0 rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
             >
-          <div className="mb-8 text-center">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Crear cuenta
-            </h1>
+              <X className="h-5 w-5" />
+            </button>
+
+            <h1 className="text-3xl font-bold text-gray-900">Crear cuenta</h1>
 
             <p className="mt-2 text-gray-600">
               Registra tu empresa y crea la cuenta del administrador.
@@ -148,12 +148,12 @@ function manejarCambio(
                 </label>
 
                 <input
-                id="nit"
-                type="text"
-                value={formulario.nit}
-                onChange={manejarCambio}
-                placeholder="Ej. 900123456-7"
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
+                  id="nit"
+                  type="text"
+                  value={formulario.nit}
+                  onChange={manejarCambio}
+                  placeholder="Ej. 900123456-7"
+                  className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -238,16 +238,10 @@ function manejarCambio(
             </h2>
 
             {cargandoPlanes && (
-              <p className="mt-4 text-gray-600">
-                Cargando planes...
-              </p>
+              <p className="mt-4 text-gray-600">Cargando planes...</p>
             )}
 
-            {errorPlanes && (
-              <p className="mt-4 text-red-600">
-                {errorPlanes}
-              </p>
-            )}
+            {errorPlanes && <p className="mt-4 text-red-600">{errorPlanes}</p>}
 
             {!cargandoPlanes && !errorPlanes && (
               <div className="mt-5 grid gap-5 md:grid-cols-3">
@@ -255,7 +249,7 @@ function manejarCambio(
                   <div
                     key={plan.id_plan}
                     className={`rounded-xl border p-5 transition ${
-                        planSeleccionado === plan.id_plan
+                      planSeleccionado === plan.id_plan
                         ? "border-blue-600 bg-blue-50 ring-2 ring-blue-200"
                         : "border-gray-200"
                     }`}
@@ -273,15 +267,15 @@ function manejarCambio(
                     </p>
 
                     <button
-                        type="button"
-                        onClick={() => setPlanSeleccionado(plan.id_plan)}
-                        className={`mt-5 w-full rounded-lg px-4 py-2 font-medium ${
+                      type="button"
+                      onClick={() => setPlanSeleccionado(plan.id_plan)}
+                      className={`mt-5 w-full rounded-lg px-4 py-2 font-medium ${
                         planSeleccionado === plan.id_plan
-                        ? "bg-blue-600 text-white"
-                        : "border border-blue-600 text-blue-600 hover:bg-blue-50"
-                        }`}
+                          ? "bg-blue-600 text-white"
+                          : "border border-blue-600 text-blue-600 hover:bg-blue-50"
+                      }`}
                     >
-                        {planSeleccionado === plan.id_plan
+                      {planSeleccionado === plan.id_plan
                         ? "Plan seleccionado"
                         : "Seleccionar"}
                     </button>
