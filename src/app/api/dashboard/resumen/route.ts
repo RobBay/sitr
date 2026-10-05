@@ -12,7 +12,7 @@ export async function GET() {
           ok: false,
           mensaje: "No autenticado.",
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -52,7 +52,13 @@ export async function GET() {
         },
         _count: {
           select: {
-            empleado: true,
+            empleado: {
+              where: {
+                estado: {
+                  in: ["ACTIVO", "SUSPENDIDO"],
+                },
+              },
+            },
           },
         },
       },
@@ -64,7 +70,7 @@ export async function GET() {
           ok: false,
           mensaje: "No se encontró la empresa.",
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -94,7 +100,7 @@ export async function GET() {
         ok: false,
         mensaje: "No fue posible consultar el resumen del dashboard.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

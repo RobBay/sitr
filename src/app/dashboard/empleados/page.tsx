@@ -61,7 +61,12 @@ export default function EmpleadosPage() {
     setMensajeFormulario("");
     setErrorFormulario("");
   }
-
+  function nuevoEmpleado() {
+    setEmpleadoEditando(null);
+    setMostrarFormulario(true);
+    setMensajeFormulario("");
+    setErrorFormulario("");
+  }
   const empleadosFiltrados = empleados.filter((empleado) => {
     const termino = busqueda.toLowerCase().trim();
 
@@ -99,13 +104,18 @@ export default function EmpleadosPage() {
     };
 
     try {
-      const respuesta = await fetch("/api/empleados", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const respuesta = await fetch(
+        empleadoEditando
+          ? `/api/empleados/${empleadoEditando.id_empleado}`
+          : "/api/empleados",
+        {
+          method: empleadoEditando ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(datosEmpleado),
         },
-        body: JSON.stringify(datosEmpleado),
-      });
+      );
 
       const datos = await respuesta.json();
 
@@ -113,13 +123,28 @@ export default function EmpleadosPage() {
         throw new Error(datos.mensaje || "No fue posible crear el empleado.");
       }
 
-      setEmpleados((empleadosActuales) => [
-        ...empleadosActuales,
-        datos.empleado,
-      ]);
+      if (empleadoEditando) {
+        setEmpleados((empleadosActuales) =>
+          empleadosActuales.map((empleado) =>
+            empleado.id_empleado === datos.empleado.id_empleado
+              ? datos.empleado
+              : empleado,
+          ),
+        );
 
-      setMensajeFormulario("Empleado creado correctamente.");
+        setMensajeFormulario("Empleado actualizado correctamente.");
+      } else {
+        setEmpleados((empleadosActuales) => [
+          ...empleadosActuales,
+          datos.empleado,
+        ]);
+
+        setMensajeFormulario("Empleado creado correctamente.");
+      }
+
       formulario.reset();
+
+      setEmpleadoEditando(null);
 
       setTimeout(() => {
         setMostrarFormulario(false);
@@ -151,10 +176,10 @@ export default function EmpleadosPage() {
 
         <button
           type="button"
-          onClick={() => setMostrarFormulario(!mostrarFormulario)}
+          onClick={nuevoEmpleado}
           className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700"
         >
-          {mostrarFormulario ? "Cerrar" : "+ Nuevo empleado"}
+          + Nuevo empleado
         </button>
       </div>
 
@@ -183,7 +208,11 @@ export default function EmpleadosPage() {
             )}
           </div>
 
-          <form onSubmit={guardarEmpleado} className="space-y-6">
+          <form
+            key={empleadoEditando?.id_empleado ?? "nuevo"}
+            onSubmit={guardarEmpleado}
+            className="space-y-6"
+          >
             <div className="grid gap-6 md:grid-cols-2">
               <div>
                 <label
@@ -321,7 +350,12 @@ export default function EmpleadosPage() {
             <div className="flex justify-end gap-3 border-t border-slate-200 pt-6">
               <button
                 type="button"
-                onClick={() => setMostrarFormulario(false)}
+                onClick={() => {
+                  setEmpleadoEditando(null);
+                  setMostrarFormulario(false);
+                  setMensajeFormulario("");
+                  setErrorFormulario("");
+                }}
                 className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
               >
                 Cancelar
@@ -332,7 +366,13 @@ export default function EmpleadosPage() {
                 disabled={guardando}
                 className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {guardando ? "Guardando..." : "Guardar empleado"}
+                {guardando
+                  ? empleadoEditando
+                    ? "Actualizando..."
+                    : "Guardando..."
+                  : empleadoEditando
+                    ? "Actualizar empleado"
+                    : "Guardar empleado"}
               </button>
             </div>
           </form>
@@ -476,7 +516,7 @@ export default function EmpleadosPage() {
                       <button
                         type="button"
                         onClick={() => editarEmpleado(empleado)}
-                        className="text-sm font-medium text-blue-600 transition hover:text-blue-800"
+                        className="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
                       >
                         Editar
                       </button>

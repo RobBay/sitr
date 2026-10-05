@@ -124,12 +124,11 @@ export default function LoginForm() {
         </div>
 
         <div className="text-center">
-          <p className="text-sm text-gray-500">
-            ¿No tienes una cuenta?
-          </p>
+          <p className="text-sm text-gray-500">¿No tienes una cuenta?</p>
 
           <button
             type="button"
+            onClick={() => router.push("/registro")}
             className="mt-2 text-sm font-medium text-blue-600 hover:underline"
           >
             Crear cuenta

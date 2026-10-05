@@ -124,7 +124,7 @@ export default function DashboardContent() {
             </span>
           </h2>
 
-          <p className="mt-2 text-sm text-gray-500">Empleados registrados</p>
+          <p className="mt-2 text-sm text-gray-500"> Empleados que ocupan cupo </p>
         </div>
 
         <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md">
