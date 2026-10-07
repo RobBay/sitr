@@ -3,24 +3,6 @@
 ```text
 sitr/
 │
-├── .agents/
-│   └── skills/
-│       └── ...                         → Skills auxiliares para herramientas de desarrollo.
-│
-├── .claude/
-│   └── skills/
-│       └── ...                         → Skills auxiliares para herramientas de desarrollo.
-│
-├── .windsurf/
-│   └── skills/
-│       └── ...                         → Skills auxiliares para herramientas de desarrollo.
-│
-├── public/
-│   ├── file.svg                        → Recurso estático de la aplicación.
-│   ├── globe.svg                       → Recurso estático de la aplicación.
-│   ├── next.svg                        → Recurso inicial de Next.js.
-│   ├── vercel.svg                      → Recurso inicial de Next.js.
-│   └── window.svg                      → Recurso estático de la aplicación.
 │
 ├── prisma/
 │   └── schema.prisma                   → Define los modelos, campos y relaciones de la base de datos.
@@ -101,32 +83,20 @@ sitr/
 │       └── prisma.ts                   → Configuración y acceso centralizado a Prisma.
 │
 ├── .gitignore                          → Define archivos que Git no debe subir al repositorio.
-├── AGENTS.md                            → Instrucciones auxiliares para agentes de desarrollo.
-├── CLAUDE.md                            → Instrucciones auxiliares para Claude.
-├── eslint.config.mjs                   → Configuración de ESLint.
-├── next.config.ts                      → Configuración de Next.js.
 ├── package.json                         → Dependencias, scripts y configuración del proyecto.
-├── package-lock.json                    → Versiones exactas de las dependencias instaladas.
-├── postcss.config.mjs                  → Configuración de PostCSS.
-├── prisma7.config.ts                   → Configuración de Prisma 7.
-├── README.md                            → Documentación principal del proyecto.
-├── skills-lock.json                     → Control de versiones de las skills utilizadas.
-└── tsconfig.json                        → Configuración de TypeScript.
+
+
 ```
-
-## Archivos auxiliares
-
-Las carpetas `.agents`, `.claude` y `.windsurf` contienen documentación y **skills de apoyo para el desarrollo**, principalmente relacionadas con Prisma. No forman parte de la lógica funcional de SITR.
 
 ## Librerías principales
 
-* **Next.js** → Framework principal de la aplicación.
-* **React** → Construcción de la interfaz.
-* **TypeScript** → Tipado del proyecto.
-* **Prisma** → ORM para la base de datos.
-* **mysql2** → Conexión con MySQL.
-* **@prisma/adapter-mariadb** → Adaptador utilizado por Prisma.
-* **bcryptjs** → Generación y comparación de hashes de contraseñas.
-* **Lucide React** → Iconos de la interfaz.
-* **Tailwind CSS** → Estilos de la aplicación.
-* **ESLint** → Revisión y calidad del código.
+- **Next.js** → Framework principal de la aplicación.
+- **React** → Construcción de la interfaz.
+- **TypeScript** → Tipado del proyecto.
+- **Prisma** → ORM para la base de datos.
+- **mysql2** → Conexión con MySQL.
+- **@prisma/adapter-mariadb** → Adaptador utilizado por Prisma.
+- **bcryptjs** → Generación y comparación de hashes de contraseñas.
+- **Lucide React** → Iconos de la interfaz.
+- **Tailwind CSS** → Estilos de la aplicación.
+- **ESLint** → Revisión y calidad del código.
